@@ -5,7 +5,7 @@ int main() {
   sycl::buffer<size_t, 1> Buffer(4);
 
   // Creating SYCL queue
-  sycl::queue Queue;
+  sycl::queue Queue {sycl::cpu_selector_v};
 
   // Size of index space for kernel
   sycl::range<1> NumOfWorkItems{Buffer.size()};
