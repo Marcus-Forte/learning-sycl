@@ -1,45 +1,41 @@
+// t.cpp
 #include <sycl/sycl.hpp>
+#include <iostream>
+
+
+#define N 10
 
 int main() {
-  // Creating buffer of 4 elements to be used inside the kernel code
-  sycl::buffer<size_t, 1> Buffer(4);
+  sycl::queue q;
 
-  // Creating SYCL queue
-  sycl::queue Queue {sycl::cpu_selector_v};
+  sycl::event ex;
+  int* d_buf = sycl::malloc_device<int>(N, q   );
+  int* h_buf = sycl::malloc_host<int>(N, q );
 
-  // Size of index space for kernel
-  sycl::range<1> NumOfWorkItems{Buffer.size()};
+  for(int i = 0; i < N; i ++){
+        h_buf[i] = i*i;
+  }
+  q.memcpy(d_buf, h_buf, N*sizeof(int)).wait();
 
-  // Submitting command group(work) to queue
-  Queue.submit([&](sycl::handler &cgh) {
-    // Getting write only access to the buffer on a device.
-    sycl::accessor Accessor{Buffer, cgh, sycl::write_only};
-    // Executing kernel
-    cgh.parallel_for<class FillBuffer>(
-        NumOfWorkItems, [=](sycl::id<1> WIid) {
-          // Fill buffer with indexes.
-          Accessor[WIid] = WIid.get(0);
-        });
-  });
+  q.parallel_for(sycl::range<1>{N}, [=](sycl::id<1> it){
+    const int i = it[0];
+    d_buf[i] += i;
+  }).wait();
+  q.memcpy(h_buf, d_buf, N*sizeof(int)).wait();
 
-  // Getting read only access to the buffer on the host.
-  // Implicit barrier waiting for queue to complete the work.
-  sycl::host_accessor HostAccessor{Buffer, sycl::read_only};
-
-  // Check the results
-  bool MismatchFound = false;
-  for (size_t I = 0; I < Buffer.size(); ++I) {
-    if (HostAccessor[I] != I) {
-      std::cout << "The result is incorrect for element: " << I
-                << " , expected: " << I << " , got: " << HostAccessor[I]
-                << std::endl;
-      MismatchFound = true;
+  int correct = 1;
+  for(int i = 0; i < N; i ++){
+    if(h_buf[i] != i*i + i){
+        std::cerr << "ERROR: h_buf[" << i << "]=" << h_buf[i] << " and shuold be " << i*i + i << std::endl;
+        correct =0;
     }
   }
-
-  if (!MismatchFound) {
-    std::cout << "The results are correct!" << std::endl;
+  if(correct){
+    std::cout << "Results are correct!!\n";
   }
 
-  return MismatchFound;
+  //# Print the device name
+  std::cout << "Device 1: " << q.get_device().get_info<sycl::info::device::name>() << "\n";
+  std::cout << "He";
+  return 0;
 }

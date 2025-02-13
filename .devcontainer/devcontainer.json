@@ -2,7 +2,8 @@
     "name": "Sycl Dev Container",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": ".."
+        "context": "..",
+		"target": "x64"
     },
     "customizations": {
 		"vscode": {
@@ -16,5 +17,8 @@
 				"clangd.arguments": ["-header-insertion=never"]
 			}
 		}
-	}
+	},
+	"runArgs": [
+		"--gpus", "all"
+	]
 }
