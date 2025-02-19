@@ -1,4 +1,4 @@
-# SYCL for Raspberry Pi
+# SYCL made easy
 
 1. --
  
@@ -19,14 +19,17 @@
 
 ## Troubleshooting / Env Vars
 
-- dpcpp: `SYCL_UR_TRACE=-1 POCL_DEBUG=all`
 - ocl: `OCL_ICD_VENDORS`
-- app: `ACPP_VISIBILITY_MASK`
-
+- pocl: `POCL_DEBUG=all`
+- acpp: `ACPP_VISIBILITY_MASK`
+- acpp: `ACPP_DEBUG_LEVEL=4`
 
 - ICD loader loads ICD clients. Vendor should supply ICD clients. Only one loader needed.
 https://stackoverflow.com/questions/36951200/enable-opencl-over-multiple-platforms-in-linux-how-to-proceed-with-icd-files
 https://linuxhandbook.com/setup-opencl-linux-docker/
 
-# APPLE POCL:
-- cmake .. -DLLC_HOST_CPU=apple-m3 -DCLANG_MARCH_FLAG=-mcpu=
+# TODO
+- Figure out efficient way of cross compiling host side.
+
+# General Info:
+- Linking against ICD loader means you can multiplex CL devices!

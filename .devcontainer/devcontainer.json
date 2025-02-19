@@ -14,11 +14,10 @@
 			],
 			"settings": {
 				"C_Cpp.intelliSenseEngine": "disabled",
-				"clangd.arguments": ["-header-insertion=never"],
-				"cmake.additionalKits": ["${workspaceFolder}/cmake/kits.json"]
+				"clangd.arguments": ["-header-insertion=never"]
 			}
 		}
-	},
+	}
 	// "runArgs": [
 	// 	"--gpus", "all"
 	// ]
