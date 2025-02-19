@@ -3,7 +3,7 @@
     "build": {
         "dockerfile": "Dockerfile",
         "context": "..",
-		"target": "x64"
+		"target": "host_arch"
     },
     "customizations": {
 		"vscode": {
@@ -14,11 +14,12 @@
 			],
 			"settings": {
 				"C_Cpp.intelliSenseEngine": "disabled",
-				"clangd.arguments": ["-header-insertion=never"]
+				"clangd.arguments": ["-header-insertion=never"],
+				"cmake.additionalKits": ["${workspaceFolder}/cmake/kits.json"]
 			}
 		}
 	},
-	"runArgs": [
-		"--gpus", "all"
-	]
+	// "runArgs": [
+	// 	"--gpus", "all"
+	// ]
 }

@@ -5,8 +5,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
 # Specify the cross-compilation tools (clang as the compiler)
-set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
-set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+# set(CMAKE_C_COMPILER /opt/bin/acpp)
+set(CMAKE_CXX_COMPILER /opt/sycl/bin/acpp)
 
 # set(CMAKE_C_COMPILER clang)
 # set(CMAKE_CXX_COMPILER clang++)

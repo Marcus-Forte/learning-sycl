@@ -8,6 +8,9 @@
 int main() {
   sycl::queue q;
 
+  std::cout << "Running on: "
+  << q.get_device().get_info<sycl::info::device::name>() << std::endl;
+  
   sycl::event ex;
   int* d_buf = sycl::malloc_device<int>(N, q   );
   int* h_buf = sycl::malloc_host<int>(N, q );
