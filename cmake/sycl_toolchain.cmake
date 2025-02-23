@@ -1,5 +1,3 @@
-# toolchain-arm64.cmake
-
 # Set the target architecture
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)

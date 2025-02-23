@@ -2,8 +2,7 @@
     "name": "Sycl Dev Container",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": "..",
-		"target": "host_arch"
+        "context": ".."
     },
     "customizations": {
 		"vscode": {
@@ -14,11 +13,10 @@
 			],
 			"settings": {
 				"C_Cpp.intelliSenseEngine": "disabled",
-				"clangd.arguments": ["-header-insertion=never"],
-				"cmake.additionalKits": ["${workspaceFolder}/cmake/kits.json"]
+				"clangd.arguments": ["-header-insertion=never"]
 			}
 		}
-	},
+	}
 	// "runArgs": [
 	// 	"--gpus", "all"
 	// ]
