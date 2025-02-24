@@ -33,3 +33,11 @@ https://linuxhandbook.com/setup-opencl-linux-docker/
 
 # General Info:
 - Linking against ICD loader means you can multiplex CL devices!
+
+
+# Step for RPi
+
+1. Install ubuntu 24.04 from RPI Imager
+2. Install same packages from Dockerfile 
+1. Install pocl-opencl-icd ocl-icd-opencl-dev
+2. build acpp : `cmake .. -DCMAKE_INSTALL_PREFIX=install -DWITH_OPENCL_BACKEND=ON -DLLVM_DIR=/usr/lib/llvm-18/cmake`
