@@ -2,8 +2,7 @@
     "name": "Sycl Dev Container",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": "..",
-		"target": "host_arch"
+        "context": ".."
     },
     "customizations": {
 		"vscode": {

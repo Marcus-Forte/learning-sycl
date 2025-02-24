@@ -4,4 +4,4 @@ project(sycl-app)
 add_compile_options(--acpp-targets=generic)
 add_executable(main src/main.cc)
 
-target_link_libraries(main OpenCL)
+# target_link_libraries(main OpenCL)
