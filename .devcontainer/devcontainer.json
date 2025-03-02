@@ -2,7 +2,7 @@
     "name": "Sycl Dev Container",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": ".."
+        "target": "build"
     },
     "customizations": {
 		"vscode": {
