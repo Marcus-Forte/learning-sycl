@@ -4,26 +4,15 @@
 using PointT = Eigen::Matrix<float, 2, 1>;
 using PointCloudT = std::vector<PointT>;
 
-float squaredDist(const PointT &a, const PointT &b) {
-  return (a - b).squaredNorm();
+float Pt2Distance(const PointT &p1, const PointT &p2) {
+  float dx = p1.x() - p2.x();
+  float dy = p1.y() - p2.y();
+  return dx * dx + dy * dy;
 }
-
-// Kernel : Runs in CPU or GPU
+// Kernel : Runs in CPU and GPU
 PointT transformPoint(const PointT &point, Eigen::Affine2f &transform) {
   return transform * point;
 }
-
-struct ErrorModel {
-
-  ErrorModel() : transform_(Eigen::Affine2f::Identity()) {}
-  ErrorModel(const Eigen::Affine2f &transform) : transform_(transform) {}
-
-  PointT operator()(const PointT &src, PointT &tgt) {
-    return tgt - transform_ * src;
-  }
-
-  Eigen::Affine2f transform_;
-};
 
 int main(int argc, char **argv) {
 
@@ -56,66 +45,62 @@ int main(int argc, char **argv) {
                    return transformPoint(point, transform);
                  });
 
+  float cpu_reduction_result = 0;
+
+  for (int i = 0; i < num_points; i++) {
+    cpu_reduction_result += Pt2Distance(input[i], output[i]);
+  }
+
   auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(
                    std::chrono::high_resolution_clock::now() - now)
                    .count();
   std::cout << "CPU time: " << delta << " ms" << std::endl;
-  for (int i = 0; i < 1; i++) {
-    std::cout << input[num_points - i - 1].transpose() << " -> "
-              << output[num_points - i - 1].transpose() << std::endl;
-  }
-
-  float total_dist = 0;
-  for (const auto &el : output) {
-    total_dist += el.squaredNorm();
-  }
-
-  std::cout << "CPU Total dist: " << total_dist << std::endl;
-
-  // GPU //
 
   auto *input_gpu =
       sycl::malloc_shared<PointT>(sizeof(PointT) * num_points, queue);
   auto *output_gpu =
       sycl::malloc_shared<PointT>(sizeof(PointT) * num_points, queue);
-  auto *observations_gpu =
-      sycl::malloc_shared<PointT>(sizeof(PointT) * num_points, queue);
   auto *matrix =
       sycl::malloc_shared<Eigen::Affine2f>(sizeof(Eigen::Affine2f), queue);
 
   queue.memcpy(input_gpu, input.data(), sizeof(PointT) * num_points).wait();
-  queue.memcpy(matrix, transform.data(), sizeof(Eigen::Affine2f)).wait();
-
-  ErrorModel model(*matrix);
+  queue.memcpy(matrix, &transform, sizeof(Eigen::Affine2f)).wait();
 
   now = std::chrono::high_resolution_clock::now();
 
-  auto *reduction_store = sycl::malloc_shared<float>(sizeof(float), queue);
-  *reduction_store = 0.0;
-  // Compute error
+  auto *gpu_reduction_result = sycl::malloc_shared<float>(sizeof(float), queue);
+  *gpu_reduction_result = 0.0f;
   queue
       .submit([&](sycl::handler &cgh) {
-        auto squared_point =
-            sycl::reduction(reduction_store, std::plus<float>());
+        auto allDistances =
+            sycl::reduction(gpu_reduction_result, 0.0f, sycl::plus<float>{});
 
-        cgh.parallel_for(
-            sycl::range<1>(num_points), squared_point,
-            [&](sycl::id<1> idx, auto &reduction) {
-              // model(input_gpu[idx], output_gpu[idx]);
-              output_gpu[idx] = model(input_gpu[idx], observations_gpu[idx]);
-              reduction.combine(squaredDist(output_gpu[idx], output_gpu[idx]));
-            });
+        cgh.parallel_for(sycl::range<1>(num_points), allDistances,
+                         [=](sycl::id<1> idx, auto &reduction) {
+                              output_gpu[idx] =
+                                  transformPoint(input_gpu[idx], *matrix);
+                           PointT transformed =
+                               transformPoint(input_gpu[idx], *matrix);
+
+                           reduction +=
+                               Pt2Distance(input_gpu[idx], transformed);
+                         });
       })
       .wait();
   delta = std::chrono::duration_cast<std::chrono::milliseconds>(
               std::chrono::high_resolution_clock::now() - now)
               .count();
   std::cout << "GPU time: " << delta << " ms" << std::endl;
-  std::cout << "GPU total dist: " << *reduction_store << std::endl;
+
+  std::cout << "GPU Reduction: " << *gpu_reduction_result << std::endl;
+  std::cout << "CPU Reduction: " << cpu_reduction_result << std::endl;
 
   auto *output_cast = reinterpret_cast<PointT *>(output_gpu);
 
+  /// CPU vs GPU results
   for (int i = 0; i < 1; i++) {
+    std::cout << input[num_points - i - 1].transpose() << " -> "
+              << output[num_points - i - 1].transpose() << std::endl;
     std::cout << input[num_points - i - 1].transpose() << " -> "
               << output_cast[num_points - i - 1].transpose() << std::endl;
   }
