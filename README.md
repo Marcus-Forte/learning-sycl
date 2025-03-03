@@ -29,15 +29,8 @@ https://stackoverflow.com/questions/36951200/enable-opencl-over-multiple-platfor
 https://linuxhandbook.com/setup-opencl-linux-docker/
 
 # TODO
-- Figure out efficient way of cross compiling host side.
+- Figure out efficient way of cross compiling host side (e.g from x86_64 -> arm64 ).
+- Create new, stripped away container with libraries only.
 
 # General Info:
-- Linking against ICD loader means you can multiplex CL devices!
-
-
-# Step for RPi
-
-1. Install ubuntu 24.04 from RPI Imager
-2. Install same packages from Dockerfile 
-1. Install pocl-opencl-icd ocl-icd-opencl-dev
-2. build acpp : `cmake .. -DCMAKE_INSTALL_PREFIX=install -DWITH_OPENCL_BACKEND=ON -DLLVM_DIR=/usr/lib/llvm-18/cmake`
+- Linking against ICD loader means you can multiplex CL devices! The `ocl-icd-opencl-dev` brings one with it.
