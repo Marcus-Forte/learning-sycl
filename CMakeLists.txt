@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.20)
-set(CMAKE_TOOLCHAIN_FILE cmake/sycl_toolchain.cmake)
 project(sycl-app)
 
 find_package(Eigen3 REQUIRED)

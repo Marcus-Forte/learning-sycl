@@ -1,9 +1,6 @@
 {
     "name": "Sycl Dev Container",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "target": "build"
-    },
+	"image": "mdnf1992/sycl-dev",
     "customizations": {
 		"vscode": {
 			"extensions": [
@@ -13,7 +10,10 @@
 			],
 			"settings": {
 				"C_Cpp.intelliSenseEngine": "disabled",
-				"clangd.arguments": ["-header-insertion=never"]
+				"clangd.arguments": ["-header-insertion=never"],
+				"cmake.additionalKits": [
+					"/opt/sycl/cmake/cmake-kits.json"
+				]
 			}
 		}
 	}
