@@ -1,0 +1,6 @@
+[
+    {
+    "name": "AdaptiveCPP",
+    "toolchainFile": "/opt/sycl/cmake/sycl_toolchain.cmake"
+    }       
+]
