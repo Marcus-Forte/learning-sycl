@@ -4,14 +4,10 @@
  
 ## Resources
 
-* https://github.com/intel/llvm/blob/sycl/sycl/doc/UsersManual.md
 * https://sycl.tech/getting-started/academy/1-what-is-sycl/lesson
-* https://github.com/intel/llvm/blob/sycl/sycl/doc/GetStartedGuide.md
-* https://portablecl.org/docs/html/sycl_with_pocl_arm.html
-* https://portablecl.org/docs/html/install.html
 * https://github.com/pocl/pocl
-* https://github.com/intel/llvm/blob/sycl/sycl/doc/EnvironmentVariables.md
 * https://github.com/AdaptiveCpp/AdaptiveCpp/blob/develop/doc/sycl-ecosystem.md
+* https://github.khronos.org/SYCL_Reference/
 
 ## SYCL Book
 

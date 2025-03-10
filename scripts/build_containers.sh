@@ -35,8 +35,6 @@ while getopts "arph" opt; do
     esac
 done
 
-
-
 if $ALL_PLATFORMS; then
     PLATFORMS="--platform linux/amd64,linux/arm64"
 else
