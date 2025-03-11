@@ -17,3 +17,9 @@ add_compile_options(--acpp-targets=generic -O3)
 add_executable(main src/main.cc)
 add_executable(point3_diff src/point3_diff.cc)
 
+add_library(NBody
+src/n_body/NBodyCPU.cc
+src/n_body/NBodyGPU.cc)
+add_executable(n_body_sim src/n_body_sim.cc)
+target_link_libraries(n_body_sim NBody)
+

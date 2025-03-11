@@ -1,5 +1,6 @@
 #include <Eigen/Dense>
 #include <sycl/sycl.hpp>
+#include "common.hh"
 
 using PointT = Eigen::Matrix<float, 3, 1>;
 using PointCloudT = std::vector<PointT>;
@@ -45,30 +46,7 @@ int main(int argc, char **argv) {
 
   const size_t num_points = std::atoi(argv[1]);
   sycl::queue queue(sycl::device::get_devices()[device_idx]);
-  std::cout << "Running on: "
-            << queue.get_device().get_info<sycl::info::device::name>()
-            << std::endl;
-
-  std::cout
-      << "Device Memory: "
-      << queue.get_device().get_info<sycl::info::device::global_mem_size>() /
-             (1024 * 1024)
-      << " MB\n";
-  std::cout
-      << "Device Shared Memory: "
-      << queue.get_device().get_info<sycl::info::device::local_mem_size>() /
-             1024
-      << " KB\n";
-
-  std::cout
-      << "Max Work Groups: "
-      << queue.get_device().get_info<sycl::info::device::max_work_group_size>()
-      << "\n";
-
-  std::cout
-      << "Max Compute units "
-      << queue.get_device().get_info<sycl::info::device::max_compute_units>()
-      << "\n";
+  printDeviceInfo(queue);
 
   PointCloudT input(num_points, PointT::Zero());
   PointCloudT output(num_points, PointT::Zero());
@@ -115,20 +93,17 @@ int main(int argc, char **argv) {
             << " MB \n";
 
   std::cout << "Copying CPU -> GPU data..." << std::endl;
-  auto *input_gpu =
-      sycl::malloc_device<PointT>(sizeof(PointT) * num_points, queue);
-  auto *output_gpu =
-      sycl::malloc_device<PointT>(sizeof(PointT) * num_points, queue);
-  auto *matrix =
-      sycl::malloc_device<Eigen::Affine3f>(sizeof(Eigen::Affine3f), queue);
+  auto *input_gpu = sycl::malloc_shared<PointT>(num_points, queue);
+  auto *output_gpu = sycl::malloc_shared<PointT>(num_points, queue);
+  auto *matrix_gpu = sycl::malloc_shared<Eigen::Affine3f>(1, queue);
 
-  queue.memcpy(input_gpu, input.data(), sizeof(PointT) * num_points).wait();
-  queue.memcpy(matrix, &transform, sizeof(Eigen::Affine3f)).wait();
+  queue.copy(input.data(), input_gpu, num_points).wait();
+  queue.copy(&transform, matrix_gpu, 1).wait();
 
-  auto *gpu_reduction_result = sycl::malloc_shared<float>(sizeof(float), queue);
+  auto *gpu_reduction_result = sycl::malloc_shared<float>(1, queue);
   *gpu_reduction_result = 0;
 
-  auto *gpu_closest_points = sycl::malloc_shared<int>(sizeof(int), queue);
+  auto *gpu_closest_points = sycl::malloc_shared<int>(1, queue);
   *gpu_closest_points = 0;
 
   now = std::chrono::high_resolution_clock::now();
@@ -145,7 +120,7 @@ int main(int argc, char **argv) {
             sycl::range<1>(num_points), allDistances, closestPoints,
             [=](sycl::id<1> idx, auto &reduction, auto &nr_closest_points) {
               // Transform
-              output_gpu[idx] = transformPoint(input_gpu[idx], *matrix);
+              output_gpu[idx] = transformPoint(input_gpu[idx], *matrix_gpu);
               // Reduction
               reduction += Pt2SquaredDistance(input_gpu[idx], output_gpu[idx]);
 
@@ -168,15 +143,15 @@ int main(int argc, char **argv) {
   std::cout << "GPU Reduction: " << *gpu_reduction_result << std::endl;
   std::cout << "CPU Reduction: " << cpu_reduction_result << std::endl;
 
-  PointT output_last_el;
-  queue.memcpy(&output_last_el, &output_gpu[num_points - 1], sizeof(PointT))
-      .wait();
+  PointT output_last_point;
+  // copy last point
+  queue.copy(&output_gpu[num_points-1], &output_last_point, 1).wait();
 
   /// CPU vs GPU results
   std::cout << "CPU: " << input[num_points - 1].transpose() << " -> "
             << output[num_points - 1].transpose() << std::endl;
   std::cout << "GPU: " << input[num_points - 1].transpose() << " -> "
-            << output_last_el.transpose() << std::endl;
+            << output_last_point.transpose() << std::endl;
 
   return 0;
 }
