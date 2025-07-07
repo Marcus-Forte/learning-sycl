@@ -35,6 +35,10 @@ while getopts "arph" opt; do
     esac
 done
 
+echo "ALL_PLATFORMS: $ALL_PLATFORMS"
+echo "RUNTIME: $RUNTIME"
+echo "PUSH: $PUSH"
+
 if $ALL_PLATFORMS; then
     PLATFORMS="--platform linux/amd64,linux/arm64"
 else
@@ -49,7 +53,7 @@ else # devcontainer
     TARGET="build"
 fi
 
-docker buildx build $PLATFORMS -f .devcontainer/Dockerfile --target $TARGET -t $TAG .
+docker build $PLATFORMS -f .devcontainer/Dockerfile --target $TARGET -t $TAG .
 
 if $PUSH; then
     docker push $TAG

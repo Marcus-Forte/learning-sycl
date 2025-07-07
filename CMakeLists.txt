@@ -22,3 +22,10 @@ src/n_body/NBodyGPU.cc)
 add_executable(n_body_sim src/n_body_sim.cc)
 target_link_libraries(n_body_sim NBody)
 
+include(GNUInstallDirs)
+install(TARGETS n_body_sim point3_diff
+DESTINATION ${CMAKE_INSTALL_BINDIR} RUNTIME_DEPENDENCY_SET runtime_targets)
+
+install(RUNTIME_DEPENDENCY_SET runtime_targets PRE_EXCLUDE_REGEXES "." PRE_INCLUDE_REGEXES "acpp"
+DESTINATION ${CMAKE_INSTALL_LIBDIR})
+

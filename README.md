@@ -1,13 +1,15 @@
 # SYCL made easy
 
-1. --
+## Docker
+
+* In `scripts`, there is a script to build dev containers and runtime containers to run sycl applications made with AdaptiveCpp. Use `-h` for guidance.
  
 ## Resources
 
-* https://sycl.tech/getting-started/academy/1-what-is-sycl/lesson
-* https://github.com/pocl/pocl
+* https://sycl.tech/getting-started#academy
 * https://github.com/AdaptiveCpp/AdaptiveCpp/blob/develop/doc/sycl-ecosystem.md
 * https://github.khronos.org/SYCL_Reference/
+* https://github.com/pocl/pocl: Port devices to OpenCL.
 
 ## SYCL Book
 
