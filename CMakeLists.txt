@@ -1,20 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda,native_cpu,spir64")
 project(sycl-app)
 
-find_package(Eigen3 REQUIRED)
+# find_package(Eigen3 REQUIRED)
+# link_libraries(Eigen3::Eigen)
+# add_executable(point3_diff src/point3_diff.cc)
 
-# NVIDIA contaienrs may only work with JIT if they inherit nvidia/cuda:12.8.0-devel*.
-# It is possible to use nvidia/cuda:12.8.0-runtime*, but only with AoT compilation.
-# To build with AoT for CUDA (e.g for --acpp-targets=cuda:sm_70), make sure to link with Cuda and Boost.
-# Uncomment below for CUDA AOT.
-# find_package(CUDAToolkit REQUIRED)
-# find_package(Boost REQUIRED COMPONENTS fiber)
-# link_libraries(CUDA::cudart Boost::fiber)
-
-link_libraries(Eigen3::Eigen)
-add_compile_options(--acpp-targets=generic -O3)
-
-add_executable(point3_diff src/point3_diff.cc)
+add_executable(primes src/primes.cc)
 
 add_library(NBody
 src/n_body/NBodyCPU.cc
@@ -23,9 +15,4 @@ add_executable(n_body_sim src/n_body_sim.cc)
 target_link_libraries(n_body_sim NBody)
 
 include(GNUInstallDirs)
-install(TARGETS n_body_sim point3_diff
-DESTINATION ${CMAKE_INSTALL_BINDIR} RUNTIME_DEPENDENCY_SET runtime_targets)
-
-install(RUNTIME_DEPENDENCY_SET runtime_targets PRE_EXCLUDE_REGEXES "." PRE_INCLUDE_REGEXES "acpp"
-DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

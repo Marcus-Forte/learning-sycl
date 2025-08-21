@@ -1,13 +1,7 @@
 {
     "name": "Sycl Dev Container",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "..",
-		"target": "develop",
-		"args": {
-			"BASE_IMG": "nvidia/cuda:12.8.0-devel-ubuntu24.04"
-		}
-	},
+	"image": "mdnf1992/sycl-dev",
+	
     "customizations": {
 		"vscode": {
 			"extensions": [
@@ -23,7 +17,7 @@
 				]
 			}
 		}
-	},
+	}
 	// "runArgs": [
 	// 	"--platform", "linux/amd64"
 	// ]

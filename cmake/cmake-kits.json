@@ -1,6 +1,6 @@
 [
     {
-    "name": "AdaptiveCPP",
+    "name": "llvm-sycl",
     "toolchainFile": "/opt/sycl/cmake/sycl_toolchain.cmake"
     }       
 ]

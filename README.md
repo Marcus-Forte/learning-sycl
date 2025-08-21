@@ -2,33 +2,25 @@
 
 ## Docker
 
-* In `scripts`, there is a script to build dev containers and runtime containers to run sycl applications made with AdaptiveCpp. Use `-h` for guidance.
+- Build the dev / runtime image by calling `./docker/build.sh`
  
 ## Resources
 
-* https://sycl.tech/getting-started#academy
-* https://github.com/AdaptiveCpp/AdaptiveCpp/blob/develop/doc/sycl-ecosystem.md
+* https://intel.github.io/llvm/index.html
 * https://github.khronos.org/SYCL_Reference/
-* https://github.com/pocl/pocl: Port devices to OpenCL.
+* https://sycl.tech/getting-started#academy
 
 ## SYCL Book
 
 * https://library.oapen.org/handle/20.500.12657/76704#:~:text=This%20open%20access%20book%20enables%20C%2B%2B%20programmers%20to,explanations%2C%20and%20code%20examples%20to%20illustrate%20key%20topics.
 
-## Troubleshooting / Env Vars
 
-- ocl: `OCL_ICD_VENDORS`
-- pocl: `POCL_DEBUG=all`
-- acpp: `ACPP_VISIBILITY_MASK`
-- acpp: `ACPP_DEBUG_LEVEL=4`
-
+## OpenCL 
 - ICD loader loads ICD clients. Vendor should supply ICD clients. Only one loader needed.
 https://stackoverflow.com/questions/36951200/enable-opencl-over-multiple-platforms-in-linux-how-to-proceed-with-icd-files
 https://linuxhandbook.com/setup-opencl-linux-docker/
+- Linking against ICD loader means you can multiplex CL devices! The `ocl-icd-opencl-dev` brings one with it.
 
 # TODO
 - Figure out efficient way of cross compiling host side (e.g from x86_64 -> arm64 ).
 - Create new, stripped away container with libraries only.
-
-# General Info:
-- Linking against ICD loader means you can multiplex CL devices! The `ocl-icd-opencl-dev` brings one with it.

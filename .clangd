@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: [-I/opt/sycl/include/AdaptiveCpp/]
+  Add: [-I/opt/sycl/llvm/build/include/]

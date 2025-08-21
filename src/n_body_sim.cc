@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   if (argc == 4) {
     device_idx = atoi(argv[3]);
 
-    if (device_idx >= sycl::device::get_num_devices()) {
+    if (device_idx >= sycl::device::get_devices().size()) {
       std::cout << "Not valid device index\n";
       exit(0);
     }
