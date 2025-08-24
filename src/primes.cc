@@ -3,42 +3,29 @@
 #include "common.hh"
 #include <cmath> // <-- This is the line you need to add
 
-using IntRange = std::pair<unsigned int, unsigned int>;
-
 static void printUsage() {
-  std::cout << "Usage: primes <number> <threads> <device>\n";
+  std::cout << "Usage: primes <number> <device>\n";
   std::cout << "Computes all prime numbers up to the specified number.\n";
 }
 
-static bool is_prime(unsigned int n) {
+static unsigned int is_prime(unsigned int n) {
   if (n < 2)
-    return false;
+    return 0;
   for (unsigned int i = 2, sq = std::sqrt(n); i <= sq; ++i)
     if (n % i == 0)
-      return false;
-  return true;
-}
-
-static unsigned int compute_primes(unsigned int first, unsigned int last) {
-  unsigned int num_primes = 0;
-  for (unsigned int i = first; i <= last; ++i) {
-    if (is_prime(i)) {
-      ++num_primes;
-    }
-  }
-  return num_primes;
+      return 0;
+  return 1;
 }
 
 int main(int argc, char **argv) {
 
-  if (argc != 4) {
+  if (argc != 3) {
     printUsage();
     return 1;
   }
 
   int number = std::atoi(argv[1]);
-  int workers = std::atoi(argv[2]);
-  int device_idx = atoi(argv[3]);
+  int device_idx = atoi(argv[2]);
 
   if (device_idx >= sycl::device::get_devices().size()) {
     std::cout << "Not valid device index\n";
@@ -53,24 +40,10 @@ int main(int argc, char **argv) {
   sycl::queue queue(sycl::device::get_devices()[device_idx]);
   printDeviceInfo(queue);
 
-  // compute ranges for each worker
-  unsigned int range = number / workers;
-  std::vector<IntRange> range_pairs;
-  for (unsigned int i = 0; i < workers; ++i) {
-    unsigned int first = i * range;
-    unsigned int last = (i == workers - 1) ? number : (i + 1) * range - 1;
-    range_pairs.push_back({first, last});
-  }
-
-  std::cout << "Nr. Ranges: " << range_pairs.size() << std::endl;
-
   auto start = std::chrono::high_resolution_clock::now();
 
-  auto *gpu_ranges = sycl::malloc_device<IntRange>(range_pairs.size(), queue);
   auto *gpu_reduction_result = sycl::malloc_device<unsigned int>(1, queue);
   queue.memset(gpu_reduction_result, 0, sizeof(unsigned int));
-
-  queue.copy(range_pairs.data(), gpu_ranges, range_pairs.size()).wait();
 
   queue
       .submit([&](sycl::handler &cgh) {
@@ -79,11 +52,9 @@ int main(int argc, char **argv) {
         auto total_nr_primes = sycl::reduction<unsigned int>(
             gpu_reduction_result, 0, sycl::plus<unsigned int>{});
 
-        cgh.parallel_for(sycl::range<1>(workers), total_nr_primes,
+        cgh.parallel_for(sycl::range<1>(number), total_nr_primes,
                          [=](sycl::id<1> idx, auto &reduction) {
-                           auto result = compute_primes(gpu_ranges[idx].first,
-                                                        gpu_ranges[idx].second);
-                           reduction += result;
+                           reduction += is_prime(idx);;
                          });
       })
       .wait();
