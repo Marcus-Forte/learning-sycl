@@ -2,7 +2,7 @@
 
 ## Docker
 
-- Build the dev / runtime image by calling `./docker/build.sh`
+- Build the dev image by calling `./docker/build.sh`
  
 ## Resources
 

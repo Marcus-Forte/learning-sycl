@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -fsycl-targets=native_cpu")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda,native_cpu")
 project(sycl-app)
 
 find_package(oneMath REQUIRED)

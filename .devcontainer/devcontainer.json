@@ -17,10 +17,7 @@
 				]
 			}
 		}
-	}
-	// "runArgs": [
-	// 	"--platform", "linux/amd64"
-	// ]
+	},
 
 	// "runArgs": [
 	// 	"--gpus", "all"

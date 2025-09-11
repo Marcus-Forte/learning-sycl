@@ -43,21 +43,17 @@ int main(int argc, char **argv) {
   auto start = std::chrono::high_resolution_clock::now();
 
   auto *gpu_reduction_result = sycl::malloc_device<unsigned int>(1, queue);
-  queue.memset(gpu_reduction_result, 0, sizeof(unsigned int));
 
-  queue
-      .submit([&](sycl::handler &cgh) {
-        // auto out = sycl::stream(1024, 768, cgh);
+  queue.submit([&](sycl::handler &cgh) {
+    // auto out = sycl::stream(1024, 768, cgh);
+    auto total_nr_primes = sycl::reduction<unsigned int>(
+        gpu_reduction_result, 0, sycl::plus<unsigned int>{},
+        sycl::property::reduction::initialize_to_identity{});
 
-        auto total_nr_primes = sycl::reduction<unsigned int>(
-            gpu_reduction_result, 0, sycl::plus<unsigned int>{});
-
-        cgh.parallel_for(sycl::range<1>(number), total_nr_primes,
-                         [=](sycl::id<1> idx, auto &reduction) {
-                           reduction += is_prime(idx);
-                         });
-      })
-      .wait();
+    cgh.parallel_for(
+        sycl::range<1>(number), total_nr_primes,
+        [=](sycl::id<1> idx, auto &reduction) { reduction += is_prime(idx); });
+  }).wait();
 
   unsigned int total_nr_primes_result = 0;
   queue.copy(gpu_reduction_result, &total_nr_primes_result, 1).wait();

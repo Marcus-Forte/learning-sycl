@@ -9,7 +9,7 @@ ENV SYCL_HOME="/opt/sycl"
 ENV PATH=$PATH:${SYCL_HOME}/bin
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SYCL_HOME}/lib
 
-RUN apt update && apt install -y git python3 cmake build-essential ninja-build clangd && \
+RUN apt update && apt install -y git python3 cmake build-essential ninja-build clangd libeigen3-dev && \
   apt clean && apt autoremove && \
   rm -rf /var/lib/apt/lists/* 
 
