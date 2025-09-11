@@ -1,7 +1,7 @@
 #include <sycl/sycl.hpp>
 
 #include "common.hh"
-#include <cmath> // <-- This is the line you need to add
+#include <cmath>
 
 static void printUsage() {
   std::cout << "Usage: primes <number> <device>\n";
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
         cgh.parallel_for(sycl::range<1>(number), total_nr_primes,
                          [=](sycl::id<1> idx, auto &reduction) {
-                           reduction += is_prime(idx);;
+                           reduction += is_prime(idx);
                          });
       })
       .wait();

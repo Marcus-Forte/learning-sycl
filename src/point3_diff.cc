@@ -36,10 +36,10 @@ int main(int argc, char **argv) {
   if (argc == 3) {
     device_idx = atoi(argv[2]);
 
-    if (device_idx >= sycl::device::get_num_devices()) {
-      std::cout << "Not valid device index\n";
-      exit(0);
-    }
+    if (device_idx >= sycl::device::get_devices().size()) {
+    std::cout << "Not valid device index\n";
+    exit(0);
+  }
   }
 
   for (const auto &device : sycl::device::get_devices()) {
@@ -123,9 +123,9 @@ int main(int argc, char **argv) {
               output_gpu[idx] = transformPoint(input_gpu[idx], *matrix_gpu);
               // Reduction
               reduction += Pt2SquaredDistance(input_gpu[idx], output_gpu[idx]);
-
+              PointT query_(0.0, 0.0, 0.0);
               // Query closest
-              if (Pt2SquaredDistance(query, output_gpu[idx]) < max_distance) {
+              if (Pt2SquaredDistance(query_, output_gpu[idx]) < max_distance) {
                 ++nr_closest_points;
               }
             });
