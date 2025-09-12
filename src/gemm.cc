@@ -91,6 +91,30 @@ int main(int argc, char **argv) {
   std::cout << "SYCL Gemm took:" << delta_us << " us\n";
   queue.copy<double>(mC, C.data(), C.size()).wait();
   cpu_gemm_event.get();
+
+  // // cuBLAS GEMM (CUDA 12.6)
+
+  // cublasHandle_t handle;
+  // cublasCreate(&handle);
+
+  // const double alpha = 1.0;
+  // const double beta = 0.0;
+
+  // auto start_cublas = std::chrono::high_resolution_clock::now();
+  // cublasDgemm(handle,
+  //       CUBLAS_OP_N, CUBLAS_OP_N,
+  //       dim, dim, dim,
+  //       &alpha,
+  //       mA, dim,
+  //       mB, dim,
+  //       &beta,
+  //       mC, dim);
+  // cudaDeviceSynchronize();
+  // auto delta_cublas_us = std::chrono::duration_cast<std::chrono::microseconds>(
+  //   std::chrono::high_resolution_clock::now() - start_cublas).count();
+  // std::cout << "cuBLAS Gemm took:" << delta_cublas_us << " us\n";
+
+  // cublasDestroy(handle);
   // free all
   sycl::free(mA, queue);
   sycl::free(mB, queue);
