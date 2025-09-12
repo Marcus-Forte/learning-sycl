@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda,native_cpu")
+cmake_minimum_required(VERSION 3.22)
 project(sycl-app)
 
 find_package(oneMath REQUIRED)
@@ -15,3 +14,16 @@ target_link_libraries(n_body_sim NBody)
 
 add_executable(gemm src/gemm.cc)
 target_link_libraries(gemm ONEMATH::onemath onemath_blas_generic Eigen3::Eigen)
+
+# Test agains direct cuda calls
+set(CUDAToolkit_ROOT CUDAToolkit_ROOT=/usr/local/cuda-12.6)
+find_package(CUDAToolkit)
+if(CUDAToolkit_FOUND)
+    find_package(cuBLAS REQUIRED)
+    message(STATUS "CUDAToolkit found")
+    add_executable(gemm_cublas src/gemm_cublas.cc)
+    target_link_libraries(gemm_cublas CUDA::cublas CUDA::cudart Eigen3::Eigen)
+    set_property(TARGET gemm_cublas PROPERTY COMPILE_OPTIONS "") # Remove SYCL options
+else()
+    message(STATUS "CUDAToolkit not found, skipping gemm_cublas target")
+endif()

@@ -1,6 +1,6 @@
-##
+# Using ubuntu 22 as it matches `nvcr.io/nvidia/l4t-cuda:12.2.12-devel` for Jetson Orin.
 
-ARG BASE_IMG=nvidia/cuda:12.6.3-devel-ubuntu24.04
+ARG BASE_IMG=nvidia/cuda:12.6.3-devel-ubuntu22.04
 
 FROM ${BASE_IMG} AS develop
 
@@ -26,17 +26,19 @@ RUN cd /tmp && git clone https://github.com/intel/llvm -b sycl && \
 RUN cd /tmp && git clone https://github.com/uxlfoundation/oneMath.git && \
     mkdir oneMath/build && cd oneMath/build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fsycl -fsycl-targets=native_cpu,nvptx64-nvidia-cuda,spir64" -DENABLE_GENERIC_BLAS_BACKEND=ON -DENABLE_MKLCPU_BACKEND=FALSE -DENABLE_MKLGPU_BACKEND=False .. && \
-    make -j8 && make install
+    cmake --build . -j4 && \
+    cmake --install . --prefix ${SYCL_HOME}
 
 COPY ./cmake/cmake-kits.json ${SYCL_HOME}/cmake/
 COPY ./cmake/sycl_toolchain.cmake ${SYCL_HOME}/cmake
 
-## 
+## For SYCL runtime, use 
+#
+# ENV SYCL_HOME="/opt/sycl"
+# ENV PATH=$PATH:${SYCL_HOME}/bin
+# ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SYCL_HOME}/lib
 
-FROM nvidia/cuda:12.6.3-devel-ubuntu24.04 AS runtime
+# COPY --from=mdnf1992/sycl-dev ${SYCL_HOME}/ ${SYCL_HOME}/
+#
 
-ENV SYCL_HOME="/opt/sycl"
-ENV PATH=$PATH:${SYCL_HOME}/bin
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SYCL_HOME}/lib
 
-COPY --from=mdnf1992/sycl-dev ${SYCL_HOME}/ ${SYCL_HOME}/
