@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sycl/sycl.hpp>
 
-inline void printDeviceInfo(const sycl::queue &queue) {
+static inline void printDeviceInfo(const sycl::queue &queue) {
   std::cout << "Running on: "
             << queue.get_device().get_info<sycl::info::device::name>()
             << std::endl;
