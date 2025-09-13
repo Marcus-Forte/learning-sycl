@@ -29,16 +29,13 @@ RUN cd /tmp && git clone https://github.com/uxlfoundation/oneMath.git && \
     cmake --build . -j4 && \
     cmake --install . --prefix ${SYCL_HOME}
 
-COPY ./cmake/cmake-kits.json ${SYCL_HOME}/cmake/
-COPY ./cmake/sycl_toolchain.cmake ${SYCL_HOME}/cmake
+# Using CUBLAS & CUSOLVER backend from NVIDIA. Apparently only works if built on a nvidia device with --runtime nvidia.
+# Or maybe im using the wrong base images.
 
-## For SYCL runtime, use 
-#
-# ENV SYCL_HOME="/opt/sycl"
-# ENV PATH=$PATH:${SYCL_HOME}/bin
-# ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SYCL_HOME}/lib
-
-# COPY --from=mdnf1992/sycl-dev ${SYCL_HOME}/ ${SYCL_HOME}/
-#
+# RUN cd /tmp && git clone https://github.com/uxlfoundation/oneMath.git && \
+#     mkdir oneMath/build && cd oneMath/build && \
+#     cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_CUSOLVER_BACKEND=TRUE -DENABLE_CUBLAS_BACKEND=TRUE -DENABLE_MKLCPU_BACKEND=FALSE -DENABLE_MKLGPU_BACKEND=False .. && \
+#     cmake --build . -j4 && \
+#     cmake --install . --prefix ${SYCL_HOME}
 
 
