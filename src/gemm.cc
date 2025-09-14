@@ -32,16 +32,16 @@ int main(int argc, char **argv) {
   sycl::queue queue(sycl::device::get_devices()[device_idx]);
   printDeviceInfo(queue);
 
-  Eigen::MatrixXd A = Eigen::MatrixXd::Random(dim, dim);
-  Eigen::MatrixXd B = Eigen::MatrixXd::Random(dim, dim);
-  Eigen::MatrixXd C(dim, dim);
+  Eigen::MatrixXf A = Eigen::MatrixXf::Random(dim, dim);
+  Eigen::MatrixXf B = Eigen::MatrixXf::Random(dim, dim);
+  Eigen::MatrixXf C(dim, dim);
 
-  auto *mA = sycl::malloc_device<double>(dim * dim, queue);
-  auto *mB = sycl::malloc_device<double>(dim * dim, queue);
-  auto *mC = sycl::malloc_device<double>(dim * dim, queue);
+  auto *mA = sycl::malloc_device<float>(dim * dim, queue);
+  auto *mB = sycl::malloc_device<float>(dim * dim, queue);
+  auto *mC = sycl::malloc_device<float>(dim * dim, queue);
 
-  auto copy_A_event = queue.copy<double>(A.data(), mA, A.size());
-  auto copy_B_event = queue.copy<double>(B.data(), mB, B.size());
+  auto copy_A_event = queue.copy<float>(A.data(), mA, A.size());
+  auto copy_B_event = queue.copy<float>(B.data(), mB, B.size());
 
   auto start = std::chrono::high_resolution_clock::now();
   sycl::event::wait({copy_A_event, copy_B_event});
@@ -69,6 +69,7 @@ int main(int argc, char **argv) {
   const oneapi::math::backend_selector<oneapi::math::backend::generic> backend(
       queue);
   #endif
+  
   start = std::chrono::high_resolution_clock::now();
   auto res = oneapi::math::blas::column_major::gemm(
       backend,
@@ -84,8 +85,8 @@ int main(int argc, char **argv) {
       dim,                               // ldb
       0.0,                               // beta
       mC,                                // C*
-      dim,                               // ldc
-      {copy_A_event, copy_B_event});
+      dim                               // ldc
+      );
 
   res.wait();
   delta_us = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -93,33 +94,9 @@ int main(int argc, char **argv) {
                  .count();
 
   std::cout << "SYCL Gemm took:" << delta_us << " us\n";
-  queue.copy<double>(mC, C.data(), C.size()).wait();
+  queue.copy<float>(mC, C.data(), C.size()).wait();
   cpu_gemm_event.get();
-
-  // // cuBLAS GEMM (CUDA 12.6)
-
-  // cublasHandle_t handle;
-  // cublasCreate(&handle);
-
-  // const double alpha = 1.0;
-  // const double beta = 0.0;
-
-  // auto start_cublas = std::chrono::high_resolution_clock::now();
-  // cublasDgemm(handle,
-  //       CUBLAS_OP_N, CUBLAS_OP_N,
-  //       dim, dim, dim,
-  //       &alpha,
-  //       mA, dim,
-  //       mB, dim,
-  //       &beta,
-  //       mC, dim);
-  // cudaDeviceSynchronize();
-  // auto delta_cublas_us = std::chrono::duration_cast<std::chrono::microseconds>(
-  //   std::chrono::high_resolution_clock::now() - start_cublas).count();
-  // std::cout << "cuBLAS Gemm took:" << delta_cublas_us << " us\n";
-
-  // cublasDestroy(handle);
-  // free all
+  
   sycl::free(mA, queue);
   sycl::free(mB, queue);
   sycl::free(mC, queue);

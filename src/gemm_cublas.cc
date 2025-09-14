@@ -45,22 +45,36 @@ int main(int argc, char **argv) {
 
   // cuBLAS GEMM (CUDA 12.6)
 
-  double *mA, *mB, *mC;
-  CHECK_CUDA(cudaMalloc((void **)&mA, dim * dim * sizeof(double)));
-  CHECK_CUDA(cudaMalloc((void **)&mB, dim * dim * sizeof(double)));
-  CHECK_CUDA(cudaMalloc((void **)&mC, dim * dim * sizeof(double)));
-  CHECK_CUDA(cudaMemcpy(mA, A.data(), dim * dim * sizeof(double), cudaMemcpyHostToDevice));
-  CHECK_CUDA(cudaMemcpy(mA, A.data(), dim * dim * sizeof(double), cudaMemcpyHostToDevice));;
+  float *mA, *mB, *mC;
+  CHECK_CUDA(cudaMalloc((void **)&mA, dim * dim * sizeof(float)));
+  CHECK_CUDA(cudaMalloc((void **)&mB, dim * dim * sizeof(float)));
+  CHECK_CUDA(cudaMalloc((void **)&mC, dim * dim * sizeof(float)));
+  CHECK_CUDA(cudaMemcpy(mA, A.data(), dim * dim * sizeof(float), cudaMemcpyHostToDevice));
+  CHECK_CUDA(cudaMemcpy(mA, A.data(), dim * dim * sizeof(float), cudaMemcpyHostToDevice));;
 
   cublasHandle_t handle;
   CHECK_CUBLAS(cublasCreate(&handle));
 
-  const double alpha = 1.0;
-  const double beta = 0.0;
+  const float alpha = 1.0;
+  const float beta = 0.0;
 
   auto start_cublas = std::chrono::high_resolution_clock::now();
-  CHECK_CUBLAS(cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, dim, dim, dim,
+  cudaEvent_t start, stop;
+  CHECK_CUDA(cudaEventCreate(&start));
+  CHECK_CUDA(cudaEventCreate(&stop));
+  CHECK_CUDA(cudaEventRecord(start, 0));
+
+  CHECK_CUBLAS(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, dim, dim, dim,
                            &alpha, mA, dim, mB, dim, &beta, mC, dim));
+
+  CHECK_CUDA(cudaEventRecord(stop, 0));
+  CHECK_CUDA(cudaEventSynchronize(stop));
+  float milliseconds = 0;
+  CHECK_CUDA(cudaEventElapsedTime(&milliseconds, start, stop));
+  std::cout << "cuBLAS Gemm (CUDA event) took: " << milliseconds << " ms\n";
+
+  CHECK_CUDA(cudaEventDestroy(start));
+  CHECK_CUDA(cudaEventDestroy(stop));
   cudaDeviceSynchronize();
   auto delta_cublas_us =
       std::chrono::duration_cast<std::chrono::microseconds>(
