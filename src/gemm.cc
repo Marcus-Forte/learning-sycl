@@ -36,9 +36,6 @@ int main(int argc, char **argv) {
   Eigen::MatrixXd B = Eigen::MatrixXd::Random(dim, dim);
   Eigen::MatrixXd C(dim, dim);
 
-  const oneapi::math::backend_selector<oneapi::math::backend::generic> backend(
-      queue);
-
   auto *mA = sycl::malloc_device<double>(dim * dim, queue);
   auto *mB = sycl::malloc_device<double>(dim * dim, queue);
   auto *mC = sycl::malloc_device<double>(dim * dim, queue);
@@ -65,6 +62,13 @@ int main(int argc, char **argv) {
   });
 
   // dispatch
+  #ifdef USE_CUBLAS_BACKEND
+   const oneapi::math::backend_selector<oneapi::math::backend::cublas> backend(
+      queue);
+  #else
+  const oneapi::math::backend_selector<oneapi::math::backend::generic> backend(
+      queue);
+  #endif
   start = std::chrono::high_resolution_clock::now();
   auto res = oneapi::math::blas::column_major::gemm(
       backend,

@@ -1,6 +1,7 @@
-# Using ubuntu 22 as it matches `nvcr.io/nvidia/l4t-cuda:12.2.12-devel` for Jetson Orin.
+# Jetson containers: https://developer.nvidia.com/embedded/jetson-cloud-native
+# Nvidia Containers: https://hub.docker.com/r/nvidia/cuda
 
-ARG BASE_IMG=nvidia/cuda:12.6.3-devel-ubuntu22.04
+ARG BASE_IMG=nvidia/cuda:12.6.1-devel-ubuntu24.04
 
 FROM ${BASE_IMG} AS develop
 
@@ -27,7 +28,8 @@ RUN cd /tmp && git clone https://github.com/uxlfoundation/oneMath.git && \
     mkdir oneMath/build && cd oneMath/build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-fsycl -fsycl-targets=native_cpu,nvptx64-nvidia-cuda,spir64" -DENABLE_GENERIC_BLAS_BACKEND=ON -DENABLE_MKLCPU_BACKEND=FALSE -DENABLE_MKLGPU_BACKEND=False .. && \
     cmake --build . -j4 && \
-    cmake --install . --prefix ${SYCL_HOME}
+    cmake --install . --prefix ${SYCL_HOME} && \
+    rm -rf /tmp/oneMath
 
 # Using CUBLAS & CUSOLVER backend from NVIDIA. Apparently only works if built on a nvidia device with --runtime nvidia.
 # Or maybe im using the wrong base images.
@@ -36,6 +38,7 @@ RUN cd /tmp && git clone https://github.com/uxlfoundation/oneMath.git && \
 #     mkdir oneMath/build && cd oneMath/build && \
 #     cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_CUSOLVER_BACKEND=TRUE -DENABLE_CUBLAS_BACKEND=TRUE -DENABLE_MKLCPU_BACKEND=FALSE -DENABLE_MKLGPU_BACKEND=False .. && \
 #     cmake --build . -j4 && \
-#     cmake --install . --prefix ${SYCL_HOME}
+#     cmake --install . --prefix ${SYCL_HOME} && \
+#     rm -rf /tmp/oneMath
 
 
