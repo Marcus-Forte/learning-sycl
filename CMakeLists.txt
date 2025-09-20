@@ -22,10 +22,11 @@ option (USE_CUBLAS_BACKEND "Use cuBLAS backend for oneMath" OFF)
 if(USE_CUBLAS_BACKEND)
     message(STATUS "Using cuBLAS backend for oneMath")
     target_compile_definitions(gemm PRIVATE USE_CUBLAS_BACKEND)
-    set(BLAS_BACKEND onemath_blas_cublas cuda)
+    set(BLAS_BACKEND ONEMATH::onemath_blas_cublas cuda)
 else()
     message(STATUS "Using generic backend for oneMath")
-    set(BLAS_BACKEND onemath_blas_generic)
+    # set(BLAS_BACKEND ONEMATH::onemath_blas_netlib gfortran) # lapack
+    set(BLAS_BACKEND ONEMATH::onemath_blas_generic) # generic
 endif()
 target_link_libraries(gemm ONEMATH::onemath ${BLAS_BACKEND} Eigen3::Eigen)
 
