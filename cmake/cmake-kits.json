@@ -1,6 +1,7 @@
 [
     {
     "name": "llvm-sycl",
-    "toolchainFile": "/opt/sycl/cmake/sycl_toolchain.cmake"
-    }       
+    "toolchainFile": "/workspaces/learning-sycl/cmake/sycl_toolchain.cmake",
+    "isTrusted": true
+  }    
 ]

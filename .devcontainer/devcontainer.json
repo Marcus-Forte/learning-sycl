@@ -1,6 +1,6 @@
 {
     "name": "Sycl Dev Container",
-	"image": "mdnf1992/sycl-dev",
+	"image": "mdnf1992/sycl-dev:lapack",
 	
     "customizations": {
 		"vscode": {
@@ -13,7 +13,7 @@
 				"C_Cpp.intelliSenseEngine": "disabled",
 				"clangd.arguments": ["-header-insertion=never"],
 				"cmake.additionalKits": [
-					"/opt/sycl/cmake/cmake-kits.json"
+					"${containerWorkspaceFolder}/cmake/cmake-kits.json"
 				]
 			}
 		}
