@@ -15,7 +15,8 @@
 int main(int argc, char **argv) {
 
   if (argc != 5) {
-    std::cout << "Usage: gemm <dim m> <dim k> <op> <device id> \n";
+    std::cout << "Execute: Gemm := C = A(m x n) * B (n x k) and Syrk := C = A^T * A\n";
+    std::cout << "Usage: gemm <dim m> <dim n> <dim k> <device id> \n";
     std::cout << "e.g: gemm 500 500 500 0 \n";
     return -1;
   }
@@ -100,17 +101,17 @@ int main(int argc, char **argv) {
       backend,
       oneapi::math::transpose::nontrans, // op(a)
       oneapi::math::transpose::nontrans, // op(b)
-      dim_m,                               // m
-      dim_n,                               // n
-      dim_k,                               // k
-      1.0,                               // alpha
-      mA,                                // A*
+      dim_m,                               // m (C is m x k)
+      dim_k,                               // n (C is m x k)
+      dim_n,                               // k (A is m x n, B is n x k)
+      1.0,                                 // alpha
+      mA,                                  // A*
       dim_m,                               // lda
-      mB,                                // B*
-      dim_k,                               // ldb
-      0.0,                               // beta
-      mC,                                // C*
-      dim_k                                // ldc
+      mB,                                  // B*
+      dim_n,                               // ldb
+      0.0,                                 // beta
+      mC,                                  // C*
+      dim_m                                // ldc
       );
 
   res.wait();
@@ -122,7 +123,7 @@ int main(int argc, char **argv) {
 
 
   start = std::chrono::high_resolution_clock::now();
-  auto res_syrk = oneapi::math::blas::column_major::syrk(
+    auto res_syrk = oneapi::math::blas::column_major::syrk(
       backend,
       oneapi::math::uplo::upper,        // upper | lower
       oneapi::math::transpose::trans,   // op(a)
