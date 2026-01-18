@@ -19,8 +19,9 @@ add_executable(onemath src/onemath.cc)
 
 # Option to select BLAS backend for `onemath`. app Note oneMath does not allow to build both backends at the same time.
 option (USE_CUBLAS_BACKEND "Use cuBLAS backend for oneMath" OFF)
-option(USE_LAPACK_BACKEND "Use lapack backend for onemath" ON)
+option (USE_LAPACK_BACKEND "Use lapack backend for onemath" ON)
 option (USE_GENERIC_BACKEND "Use generic backend for oneMath" OFF)
+# TODO can we get this from oneMath somehow?
 if(USE_CUBLAS_BACKEND)
     message(STATUS "Using cuBLAS backend for oneMath")
     target_compile_definitions(onemath PRIVATE USE_CUBLAS_BACKEND)
@@ -30,7 +31,7 @@ elseif(USE_LAPACK_BACKEND)
     target_compile_definitions(onemath PRIVATE USE_LAPACK_BACKEND)
     set(BLAS_BACKEND ONEMATH::onemath_blas_netlib gfortran) # lapack
 elseif(USE_GENERIC_BACKEND)
-    target_compile_definitions(onemath PRIVATE USE_LAPACK_BACKEND)
+    target_compile_definitions(onemath PRIVATE USE_GENERIC_BACKEND)
     message(STATUS "Using generic backend for oneMath")
     set(BLAS_BACKEND ONEMATH::onemath_blas_generic) # generic
 else()

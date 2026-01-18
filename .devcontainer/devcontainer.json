@@ -1,6 +1,6 @@
 {
     "name": "Sycl Dev Container",
-	"image": "mdnf1992/sycl-dev:lapack",
+	"image": "mdnf1992/sycl-dev",
 	
     "customizations": {
 		"vscode": {

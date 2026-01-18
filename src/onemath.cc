@@ -96,6 +96,7 @@ int main(int argc, char **argv) {
       #error "No BLAS backend selected for oneMath"
   #endif
   
+  try {
   start = std::chrono::high_resolution_clock::now();
   auto res = oneapi::math::blas::column_major::gemm(
       backend,
@@ -120,8 +121,12 @@ int main(int argc, char **argv) {
                  .count();
 
   std::cout << "Onemath gemm took:" << delta_us << " us\n";
+  } catch (const std::exception &e) {
+    std::cerr << "Exception during gemm: " << e.what() << std::endl;
+  }
 
-
+  
+  try {
   start = std::chrono::high_resolution_clock::now();
     auto res_syrk = oneapi::math::blas::column_major::syrk(
       backend,
@@ -142,6 +147,9 @@ int main(int argc, char **argv) {
                   .count();
 
   std::cout << "Onemath syrk took:" << delta_us << " us\n";
+  } catch (const std::exception &e) {
+    std::cerr << "Exception during syrk: " << e.what() << std::endl;
+  }
 
   cpu_gemm_event.get();
   cpu_syrk_event.get();
