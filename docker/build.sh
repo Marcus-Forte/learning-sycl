@@ -6,7 +6,7 @@
 docker build --push -f .devcontainer/Dockerfile --build-arg BASE_IMG=mdnf1992/cpp-dev --target onemath_lapack -t mdnf1992/sycl-dev .
 
 # Default (Lapack) + Cuda
-docker build --push -f .devcontainer/Dockerfile --build-arg SYCL_CUDA_FLAG="--cuda" --build-arg BASE_IMG=nvidia/cuda:12.6.1-devel-ubuntu24.04 --target onemath_lapack -t mdnf1992/sycl-dev:cuda .
+docker build --push -f .devcontainer/Dockerfile --build-arg SYCL_CUDA_FLAG="--cuda" --build-arg BASE_IMG=nvidia/cuda:12.6.1-devel-ubuntu24.04 --target onemath_cublas -t mdnf1992/sycl-dev:cuda .
 
 # Default (Generic)
 docker build --push -f .devcontainer/Dockerfile --build-arg BASE_IMG=mdnf1992/cpp-dev --target onemath_generic -t mdnf1992/sycl-dev:generic .
