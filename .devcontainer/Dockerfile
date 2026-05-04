@@ -1,7 +1,8 @@
 # Jetson containers: https://developer.nvidia.com/embedded/jetson-cloud-native
 # Nvidia Containers: https://hub.docker.com/r/nvidia/cuda
 
-ARG BASE_IMG=nvidia/cuda:12.6.1-devel-ubuntu24.04
+# BASE_IMG should contain CUDA if building sycl with cuda.
+ARG BASE_IMG
 
 # Common base: OS deps and SYCL environment vars
 FROM ${BASE_IMG} AS sycl_deps
